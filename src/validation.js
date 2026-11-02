@@ -1,0 +1,11 @@
+const { z } = require('zod');
+
+const schemas = {
+  users: z.object({ name: z.string().min(2), email: z.string().email(), role: z.enum(['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER']).default('OPERATOR'), active: z.coerce.number().int().min(0).max(1).default(1), password: z.string().min(8).optional() }),
+  vehicles: z.object({ plate: z.string().min(5).max(10), model: z.string().min(2), type: z.enum(['ELETRICO', 'UTILITARIO', 'CAMINHAO', 'MOTO', 'BICICLETA']), capacity_kg: z.coerce.number().positive(), status: z.enum(['DISPONIVEL', 'EM_ROTA', 'MANUTENCAO', 'INATIVO']), cep: z.string().max(9).nullable().optional(), latitude: z.coerce.number().min(-90).max(90).nullable().optional(), longitude: z.coerce.number().min(-180).max(180).nullable().optional(), driver_name: z.string().nullable().optional() }),
+  deliveries: z.object({ code: z.string().min(4), recipient: z.string().min(2), address: z.string().min(5), cep: z.string().max(9).nullable().optional(), latitude: z.coerce.number().min(-90).max(90), longitude: z.coerce.number().min(-180).max(180), priority: z.enum(['BAIXA', 'MEDIA', 'ALTA', 'URGENTE']), status: z.enum(['PENDENTE', 'EM_TRANSITO', 'ENTREGUE', 'ATRASADA', 'CANCELADA']), scheduled_at: z.string().optional(), delivered_at: z.string().nullable().optional(), vehicle_id: z.coerce.number().int().positive().nullable().optional(), notes: z.string().nullable().optional() }),
+  routes: z.object({ name: z.string().min(3), vehicle_id: z.coerce.number().int().positive().nullable().optional(), status: z.enum(['PLANEJADA', 'ATIVA', 'CONCLUIDA', 'CANCELADA']), origin_latitude: z.coerce.number(), origin_longitude: z.coerce.number(), total_distance_km: z.coerce.number().min(0).default(0), estimated_minutes: z.coerce.number().int().min(0).default(0), co2_kg: z.coerce.number().min(0).default(0), service_level: z.coerce.number().min(0).max(100).default(100), started_at: z.string().nullable().optional(), finished_at: z.string().nullable().optional() }),
+  simulations: z.object({ name: z.string().min(3), created_by: z.coerce.number().int().positive().optional(), parameters: z.record(z.any()).default({}), distance_km: z.coerce.number().min(0), duration_minutes: z.coerce.number().int().min(0), cost_estimate: z.coerce.number().min(0), co2_kg: z.coerce.number().min(0), service_level: z.coerce.number().min(0).max(100) })
+};
+
+module.exports = schemas;

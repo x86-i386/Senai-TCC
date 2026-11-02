@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: urbanlink-flow
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_DRIVER
+        value: postgresql
+      - key: DB_AUTO_MIGRATE
+        value: "true"
+      - key: BANCO_SSL
+        value: "false"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: URL_BANCO
+        fromDatabase:
+          name: urbanlink-flow-banco
+          property: connectionString
+
+databases:
+  - name: urbanlink-flow-banco
+    databaseName: urbanlink_flow
+    user: urbanlink_flow
+    plan: free
+    region: oregon

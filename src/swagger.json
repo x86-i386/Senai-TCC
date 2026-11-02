@@ -1,0 +1,35 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "UrbanLink Flow API",
+    "version": "1.0.0",
+    "description": "API REST para gestão, monitoramento e simulação de logística urbana."
+  },
+  "servers": [{ "url": "/api", "description": "Servidor atual" }],
+  "components": {
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } },
+    "schemas": {
+      "Login": { "type": "object", "required": ["email", "password"], "properties": { "email": { "type": "string", "format": "email" }, "password": { "type": "string", "format": "password" } } },
+      "Vehicle": { "type": "object", "properties": { "id": { "type": "integer" }, "plate": { "type": "string" }, "model": { "type": "string" }, "type": { "type": "string" }, "capacity_kg": { "type": "number" }, "status": { "type": "string" }, "driver_name": { "type": "string" } } },
+      "Delivery": { "type": "object", "properties": { "id": { "type": "integer" }, "code": { "type": "string" }, "recipient": { "type": "string" }, "address": { "type": "string" }, "priority": { "type": "string" }, "status": { "type": "string" }, "latitude": { "type": "number" }, "longitude": { "type": "number" } } }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/health": { "get": { "security": [], "summary": "Verifica a saúde da API", "responses": { "200": { "description": "API disponível" } } } },
+    "/public/stats": { "get": { "security": [], "summary": "Retorna indicadores públicos da operação", "responses": { "200": { "description": "Indicadores públicos" } } } },
+    "/public/quote": { "post": { "security": [], "summary": "Calcula uma estimativa pública de entrega", "responses": { "200": { "description": "Distância, prazo, custo e emissão estimados" }, "422": { "description": "Origem ou destino inválido" } } } },
+    "/auth/login": { "post": { "security": [], "summary": "Autentica um usuário", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Login" } } } }, "responses": { "200": { "description": "Token JWT e usuário" }, "401": { "description": "Credenciais inválidas" } } } },
+    "/dashboard": { "get": { "summary": "Retorna os principais indicadores", "responses": { "200": { "description": "Indicadores operacionais" } } } },
+    "/vehicles": { "get": { "summary": "Lista veículos", "responses": { "200": { "description": "Lista de veículos" } } }, "post": { "summary": "Cadastra um veículo", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Vehicle" } } } }, "responses": { "201": { "description": "Veículo cadastrado" } } } },
+    "/vehicles/{id}": { "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "get": { "summary": "Busca um veículo", "responses": { "200": { "description": "Veículo" } } }, "put": { "summary": "Atualiza um veículo", "responses": { "200": { "description": "Veículo atualizado" } } }, "delete": { "summary": "Exclui um veículo", "responses": { "204": { "description": "Veículo excluído" } } } },
+    "/deliveries": { "get": { "summary": "Lista entregas", "responses": { "200": { "description": "Lista de entregas" } } }, "post": { "summary": "Cadastra uma entrega", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Delivery" } } } }, "responses": { "201": { "description": "Entrega cadastrada" } } } },
+    "/deliveries/{id}": { "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "get": { "summary": "Busca uma entrega", "responses": { "200": { "description": "Entrega" } } }, "put": { "summary": "Atualiza uma entrega", "responses": { "200": { "description": "Entrega atualizada" } } }, "delete": { "summary": "Exclui uma entrega", "responses": { "204": { "description": "Entrega excluída" } } } },
+    "/deliveries/{id}/status": { "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "patch": { "summary": "Avança o status da entrega conforme o fluxo permitido", "responses": { "200": { "description": "Entrega atualizada" }, "409": { "description": "Transição não permitida" } } } },
+    "/routes": { "get": { "summary": "Lista rotas", "responses": { "200": { "description": "Lista de rotas" } } }, "post": { "summary": "Cadastra uma rota", "responses": { "201": { "description": "Rota cadastrada" } } } },
+    "/simulations": { "get": { "summary": "Lista simulações", "responses": { "200": { "description": "Lista de simulações" } } } },
+    "/simulations/run": { "post": { "summary": "Executa e salva uma simulação", "responses": { "201": { "description": "Resultado da simulação" } } } },
+    "/optimization/route": { "post": { "summary": "Otimiza a sequência de paradas", "responses": { "200": { "description": "Rota otimizada e indicadores" } } } },
+    "/reports/deliveries.csv": { "get": { "summary": "Exporta entregas em CSV", "responses": { "200": { "description": "Arquivo CSV" } } } }
+  }
+}
